@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good111 - লগইন</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --bg:#080c14; --fg:#e8edf5; --muted:#6d7f96;
+            --accent:#00e68a; --accent-dim:rgba(0,230,138,0.1);
+            --accent-glow:rgba(0,230,138,0.3);
+            --card:rgba(10,16,28,0.92); --card-border:rgba(0,230,138,0.09);
+            --danger:#ff4757; --warning:#ffa502; --gold:#ffd700;
+            --bkash:#E2136E; --nagad:#F6921E;
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{
+            font-family:'Noto Sans Bengali',sans-serif;
+            background:var(--bg);color:var(--fg);
+            min-height:100vh;overflow-x:hidden;
+        }
+
+        /* ব্যাকগ্রাউন্ড */
+        .bg-layer{position:fixed;inset:0;z-index:0}
+        .bg-layer img{width:100%;height:100%;object-fit:cover;filter:brightness(.22) saturate(1.3)}
+        .bg-overlay{
+            position:fixed;inset:0;z-index:1;
+            background:
+                radial-gradient(ellipse at 25% 35%,rgba(0,230,138,.06) 0%,transparent 55%),
+                radial-gradient(ellipse at 80% 75%,rgba(226,19,110,.04) 0%,transparent 45%),
+                linear-gradient(180deg,rgba(8,12,20,.35) 0%,rgba(8,12,20,.92) 100%);
+        }
+        .grid-bg{
+            position:fixed;inset:0;z-index:2;pointer-events:none;
+            background-image:
+                linear-gradient(rgba(0,230,138,.02) 1px,transparent 1px),
+                linear-gradient(90deg,rgba(0,230,138,.02) 1px,transparent 1px);
+            background-size:50px 50px;
+        }
+
+        /* পার্টিকেল */
+        .particles{position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden}
+        .particle{position:absolute;border-radius:50%;background:var(--accent);opacity:0;animation:pF linear infinite}
+        @keyframes pF{
+            0%{transform:translateY(100vh) scale(0);opacity:0}
+            10%{opacity:.4}90%{opacity:.12}
+            100%{transform:translateY(-8vh) scale(1.2);opacity:0}
+        }
+
+        /* মেইন */
+        .main-wrap{
+            position:relative;z-index:10;min-height:100vh;
+            display:flex;align-items:center;justify-content:center;padding:14px;
+        }
+
+        /* কার্ড */
+        .card{
+            width:100%;max-width:440px;
+            background:var(--card);
+            backdrop-filter:blur(26px) saturate(1.4);
+            -webkit-backdrop-filter:blur(26px) saturate(1.4);
+            border:1px solid var(--card-border);
+            border-radius:20px;padding:34px 28px;
+            position:relative;overflow:hidden;
+            animation:cUp .7s cubic-bezier(.16,1,.3,1) forwards;
+            transform:translateY(22px);opacity:0;
+        }
+        .card.wide{max-width:480px}
+        @keyframes cUp{to{transform:translateY(0);opacity:1}}
+        .card::before{
+            content:'';position:absolute;
+            top:-1px;left:18%;right:18%;height:2px;
+            background:linear-gradient(90deg,transparent,var(--accent),transparent);
+        }
+        .scan-line{
+            position:absolute;left:0;right:0;height:1px;
+            background:linear-gradient(90deg,transparent,var(--accent-glow),transparent);
+            animation:scanY 5s ease-in-out infinite;
+            pointer-events:none;z-index:3;
+        }
+        @keyframes scanY{0%{top:0;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:100%;opacity:0}}
+
+        /* লোগো */
+        .logo-sec{text-align:center;margin-bottom:24px}
+        .logo-box{
+            width:64px;height:64px;margin:0 auto 12px;border-radius:16px;
+            background:linear-gradient(135deg,var(--accent-dim),rgba(226,19,110,.06));
+            border:1px solid var(--card-border);
+            display:flex;align-items:center;justify-content:center;
+            animation:lP 3s ease-in-out infinite;overflow:hidden;
+        }
+        .logo-box img{width:42px;height:42px;object-fit:contain}
+        @keyframes lP{0%,100%{box-shadow:0 0 18px var(--accent-dim)}50%{box-shadow:0 0 32px var(--accent-glow)}}
+        .logo-t{
+            font-family:'Orbitron',sans-serif;
+            font-size:24px;font-weight:900;letter-spacing:3px;
+            background:linear-gradient(135deg,var(--accent),var(--gold));
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+        }
+        .logo-s{font-size:11px;color:var(--muted);letter-spacing:1px}
+
+        /* টাইটেল */
+        .pg-title{font-size:20px;font-weight:700;text-align:center;margin-bottom:4px}
+        .pg-desc{font-size:12.5px;color:var(--muted);text-align:center;margin-bottom:22px;line-height:1.6}
+
+        /* ফর্ম */
+        .fg{margin-bottom:16px}
+        .fl{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px}
+        .iw{position:relative}
+        .iw i.ic{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;transition:color .3s;z-index:2}
+        .fi{
+            width:100%;padding:12px 13px 12px 40px;
+            background:rgba(255,255,255,.035);
+            border:1.5px solid rgba(255,255,255,.06);
+            border-radius:11px;color:var(--fg);
+            font-size:15px;font-family:'Noto Sans Bengali',sans-serif;
+            outline:none;transition:all .3s;
+        }
+        .fi::placeholder{color:rgba(255,255,255,.16)}
+        .fi:focus{border-color:var(--accent);background:rgba(0,230,138,.03);box-shadow:0 0 0 3px rgba(0,230,138,.06)}
+        .iw:focus-within i.ic{color:var(--accent)}
+        .fi.err{border-color:var(--danger);background:rgba(255,71,87,.03);animation:shk .35s ease}
+        @keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+        .err-t{font-size:11.5px;color:var(--danger);margin-top:5px;display:none;align-items:center;gap:4px}
+        .err-t.show{display:flex}
+
+        /* বাটন */
+        .btn-p{
+            width:100%;padding:13px;border:none;border-radius:11px;
+            font-size:15px;font-weight:700;
+            font-family:'Noto Sans Bengali',sans-serif;
+            cursor:pointer;position:relative;overflow:hidden;
+            background:linear-gradient(135deg,#00c974,#00e68a,#00ff9d);
+            color:#080c14;letter-spacing:.4px;
+            transition:all .3s;box-shadow:0 4px 18px rgba(0,230,138,.22);margin-top:6px;
+        }
+        .btn-p:hover{transform:translateY(-2px);box-shadow:0 7px 28px rgba(0,230,138,.3)}
+        .btn-p:active{transform:translateY(0)}
+        .btn-p::after{
+            content:'';position:absolute;inset:0;
+            background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);
+            transform:translateX(-100%);transition:transform .5s;
+        }
+        .btn-p:hover::after{transform:translateX(100%)}
+        .btn-p:disabled{opacity:.55;cursor:not-allowed;transform:none}
+        .btn-p .sp{
+            display:none;width:18px;height:18px;
+            border:2.5px solid rgba(8,12,20,.2);border-top-color:#080c14;
+            border-radius:50%;animation:spin .65s linear infinite;margin:0 auto;
+        }
+        .btn-p.ld .bt{display:none}
+        .btn-p.ld .sp{display:block}
+        @keyframes spin{to{transform:rotate(360deg)}}
+
+        /* টোস্ট */
+        .toast-c{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+        .toast{
+            padding:12px 18px;border-radius:11px;
+            font-size:13px;font-weight:500;color:#fff;
+            backdrop-filter:blur(14px);
+            display:flex;align-items:center;gap:8px;
+            min-width:260px;max-width:360px;
+            animation:tIn .4s cubic-bezier(.16,1,.3,1) forwards;
+            box-shadow:0 6px 24px rgba(0,0,0,.3);
+        }
+        .toast.success{background:rgba(0,195,115,.92);border:1px solid rgba(0,230,138,.35)}
+        .toast.error{background:rgba(210,45,55,.92);border:1px solid rgba(255,71,87,.35)}
+        .toast.info{background:rgba(0,145,220,.92);border:1px solid rgba(0,180,255,.35)}
+        .toast.out{animation:tOut .3s ease forwards}
+        @keyframes tIn{from{transform:translateX(90px);opacity:0}to{transform:translateX(0);opacity:1}}
+        @keyframes tOut{to{transform:translateX(90px);opacity:0}}
+
+        /* ড্যাশবোর্ড */
+        .dash-header{
+            display:flex;align-items:center;justify-content:space-between;
+            margin-bottom:20px;padding-bottom:14px;
+            border-bottom:1px solid rgba(255,255,255,.05);
+        }
+        .dash-user{display:flex;align-items:center;gap:10px}
+        .dash-avatar{
+            width:42px;height:42px;border-radius:12px;
+            background:linear-gradient(135deg,var(--accent-dim),rgba(226,19,110,.08));
+            border:1px solid var(--card-border);
+            display:flex;align-items:center;justify-content:center;
+            font-size:18px;color:var(--accent);
+        }
+        .dash-name{font-size:15px;font-weight:700}
+        .dash-phone{font-size:11.5px;color:var(--muted)}
+        .logout-btn{
+            background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.15);
+            color:var(--danger);border-radius:9px;
+            padding:7px 14px;font-size:12px;font-weight:600;
+            font-family:'Noto Sans Bengali',sans-serif;cursor:pointer;transition:all .2s;
+        }
+        .logout-btn:hover{background:rgba(255,71,87,.15)}
+
+        /* ডিপোজিট হিস্ট্রি */
+        .sec-title{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+        .sec-title i{color:var(--accent);font-size:15px}
+
+        .dep-list{display:flex;flex-direction:column;gap:8px;margin-bottom:22px}
+        .dep-item{
+            display:flex;align-items:center;justify-content:space-between;
+            padding:12px 14px;border-radius:11px;
+            background:rgba(255,255,255,.03);
+            border:1px solid rgba(255,255,255,.04);
+            transition:all .2s;
+        }
+        .dep-item:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.07)}
+        .dep-left{display:flex;align-items:center;gap:10px}
+        .dep-icon{
+            width:36px;height:36px;border-radius:9px;
+            display:flex;align-items:center;justify-content:center;
+            font-size:13px;font-weight:700;
+        }
+        .dep-icon.bkash{background:rgba(226,19,110,.12);color:var(--bkash)}
+        .dep-icon.nagad{background:rgba(246,146,30,.12);color:var(--nagad)}
+        .dep-info .dep-amt{font-size:15px;font-weight:700}
+        .dep-info .dep-meth{font-size:11px;color:var(--muted);margin-top:1px}
+        .dep-status{font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:6px;letter-spacing:.3px}
+        .dep-status.pending{background:rgba(255,165,2,.1);color:var(--warning);border:1px solid rgba(255,165,2,.15)}
+        .dep-status.approved{background:rgba(0,230,138,.08);color:var(--accent);border:1px solid rgba(0,230,138,.12)}
+        .dep-status.rejected{background:rgba(255,71,87,.08);color:var(--danger);border:1px solid rgba(255,71,87,.12)}
+
+        /* রিকভারি */
+        .recover-box{
+            background:linear-gradient(135deg,rgba(0,230,138,.06),rgba(255,215,0,.04));
+            border:1px solid rgba(0,230,138,.12);
+            border-radius:14px;padding:18px;margin-bottom:22px;
+        }
+        .recover-label{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+        .recover-label i{color:var(--warning)}
+        .recover-amount{
+            font-size:28px;font-weight:900;
+            background:linear-gradient(135deg,var(--accent),var(--gold));
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+            margin-bottom:4px;
+        }
+        .recover-note{font-size:11.5px;color:var(--muted);line-height:1.5}
+
+        /* পেমেন্ট কার্ড */
+        .pay-title{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+        .pay-title i{color:var(--gold)}
+        .pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+        .pay-card{
+            padding:20px 14px;border-radius:14px;
+            border:1.5px solid rgba(255,255,255,.06);
+            background:rgba(255,255,255,.03);
+            cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);
+            text-align:center;position:relative;overflow:hidden;
+            text-decoration:none;color:var(--fg);display:block;
+        }
+        .pay-card:hover{transform:translateY(-3px)}
+        .pay-card.bkash{
+            border-color:rgba(226,19,110,.2);
+            background:linear-gradient(135deg,rgba(226,19,110,.06),rgba(226,19,110,.02));
+        }
+        .pay-card.bkash:hover{
+            border-color:var(--bkash);
+            box-shadow:0 6px 28px rgba(226,19,110,.2);
+            background:linear-gradient(135deg,rgba(226,19,110,.1),rgba(226,19,110,.04));
+        }
+        .pay-card.nagad{
+            border-color:rgba(246,146,30,.2);
+            background:linear-gradient(135deg,rgba(246,146,30,.06),rgba(246,146,30,.02));
+        }
+        .pay-card.nagad:hover{
+            border-color:var(--nagad);
+            box-shadow:0 6px 28px rgba(246,146,30,.2);
+            background:linear-gradient(135deg,rgba(246,146,30,.1),rgba(246,146,30,.04));
+        }
+        .pay-card .pay-icon{
+            width:50px;height:50px;border-radius:14px;
+            margin:0 auto 10px;display:flex;align-items:center;justify-content:center;
+            font-size:18px;font-weight:800;
+        }
+        .pay-card.bkash .pay-icon{background:rgba(226,19,110,.15);color:var(--bkash)}
+        .pay-card.nagad .pay-icon{background:rgba(246,146,30,.15);color:var(--nagad)}
+        .pay-card .pay-name{font-size:15px;font-weight:700}
+        .pay-card .pay-hint{font-size:10.5px;color:var(--muted);margin-top:3px}
+        .pay-card .arrow-icon{
+            position:absolute;bottom:10px;right:12px;
+            font-size:12px;color:var(--muted);opacity:0;
+            transition:all .3s;transform:translateX(-4px);
+        }
+        .pay-card:hover .arrow-icon{opacity:1;transform:translateX(0)}
+
+        /* পালস রিং */
+        .pay-card .pulse-ring{
+            position:absolute;top:50%;left:50%;
+            width:0;height:0;border-radius:50%;
+            border:2px solid transparent;
+            transform:translate(-50%,-50%);
+        }
+        .pay-card.bkash .pulse-ring{border-color:rgba(226,19,110,.15)}
+        .pay-card.nagad .pulse-ring{border-color:rgba(246,146,30,.15)}
+        .pay-card:hover .pulse-ring{animation:pRing .8s ease-out forwards}
+        @keyframes pRing{
+            to{width:120px;height:120px;opacity:0}
+        }
+
+        .footer-t{text-align:center;margin-top:18px;font-size:10.5px;color:rgba(255,255,255,.12);letter-spacing:.4px}
+
+        @media(max-width:480px){
+            .card{padding:28px 20px;border-radius:16px}
+            .logo-t{font-size:22px}
+            .pg-title{font-size:18px}
+            .recover-amount{font-size:24px}
+            .toast{min-width:unset;max-width:calc(100vw - 32px)}
+        }
+        @media(prefers-reduced-motion:reduce){
+            *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+        }
+    </style>
+</head>
+<body>
+
+<!-- ব্যাকগ্রাউন্ড -->
+<div class="bg-layer">
+    <img src="https://good11bd.com/wp-content/uploads/2026/02/app_download_icon_gd1bdts2_20260224005154.png" alt="">
+</div>
+<div class="bg-overlay"></div>
+<div class="grid-bg"></div>
+<div class="particles" id="particles"></div>
+
+<!-- টোস্ট -->
+<div class="toast-c" id="toastC" role="alert" aria-live="polite"></div>
+
+<main class="main-wrap">
+
+    <!-- ===== লগইন কার্ড ===== -->
+    <div class="card" id="loginCard">
+        <div class="scan-line"></div>
+        <div class="logo-sec">
+            <div class="logo-box">
+                <img src="https://good11bd.com/wp-content/uploads/2026/02/app_download_icon_gd1bdts2_20260224005154.png" alt="Good111">
+            </div>
+            <div class="logo-t">GOOD111</div>
+            <div class="logo-s">ট্রাস্টেড প্ল্যাটফর্ম</div>
+        </div>
+        <h1 class="pg-title">লগইন করুন</h1>
+        <p class="pg-desc">ইউজারনেম বা ফোন নাম্বার দিয়ে লগইন করুন<br>পাসওয়ার্ড এর প্রয়োজন নেই</p>
+        <form id="loginForm" novalidate>
+            <div class="fg">
+                <label class="fl" for="loginId">ইউজারনেম / ফোন নাম্বার</label>
+                <div class="iw">
+                    <input type="text" id="loginId" class="fi" placeholder="ফোন নাম্বার বা ইউজারনেম লিখুন" autocomplete="tel" required aria-describedby="loginErr">
+                    <i class="fas fa-user ic"></i>
+                </div>
+                <div class="err-t" id="loginErr"><i class="fas fa-exclamation-circle"></i><span>ইউজারনেম বা ফোন নাম্বার দিন</span></div>
+            </div>
+            <button type="submit" class="btn-p" id="loginBtn">
+                <span class="bt">লগইন</span>
+                <div class="sp"></div>
+            </button>
+        </form>
+    </div>
+
+    <!-- ===== ড্যাশবোর্ড কার্ড ===== -->
+    <div class="card wide" id="dashCard" style="display:none">
+        <div class="scan-line"></div>
+
+        <!-- হেডার -->
+        <div class="dash-header">
+            <div class="dash-user">
+                <div class="dash-avatar"><i class="fas fa-user"></i></div>
+                <div>
+                    <div class="dash-name" id="dashName">-</div>
+                    <div class="dash-phone" id="dashPhone">-</div>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> লগআউট</button>
+        </div>
+
+        <!-- ডিপোজিট হিস্ট্রি -->
+        <div class="sec-title"><i class="fas fa-history"></i> ডিপোজিট হিস্ট্রি</div>
+        <div class="dep-list" id="depList"></div>
+
+        <!-- রিকভারি -->
+        <div class="recover-box" id="recoverBox">
+            <div class="recover-label"><i class="fas fa-shield-alt"></i> Recover Deposit</div>
+            <div class="recover-amount" id="recoverAmt">৳0</div>
+            <div class="recover-note" id="recoverNote">পেন্ডিং ডিপোজিট পাওয়া যায়নি</div>
+        </div>
+
+        <!-- পেমেন্ট অপশন -->
+        <div id="paySection" style="display:none">
+            <div class="pay-title"><i class="fas fa-wallet"></i> পেমেন্ট অপশন</div>
+            <div class="pay-grid">
+                <a class="pay-card bkash" id="bkashLink" href="#" role="button">
+                    <div class="pulse-ring"></div>
+                    <div class="pay-icon">bKash</div>
+                    <div class="pay-name">বিকাশ</div>
+                    <div class="pay-hint">সেন্ড মানি করুন</div>
+                    <i class="fas fa-arrow-right arrow-icon"></i>
+                </a>
+                <a class="pay-card nagad" id="nagadLink" href="#" role="button">
+                    <div class="pulse-ring"></div>
+                    <div class="pay-icon">নগদ</div>
+                    <div class="pay-name">নগদ</div>
+                    <div class="pay-hint">সেন্ড মানি করুন</div>
+                    <i class="fas fa-arrow-right arrow-icon"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-t">GOOD111 &copy; 2025 | সর্বস্বত্ব সংরক্ষিত</div>
+    </div>
+
+</main>
+
+<script>
+/* ===== পার্টিকেল ===== */
+(function(){
+    const c=document.getElementById('particles');
+    for(let i=0;i<20;i++){
+        const p=document.createElement('div');
+        p.className='particle';
+        p.style.left=Math.random()*100+'%';
+        p.style.animationDuration=(7+Math.random()*9)+'s';
+        p.style.animationDelay=(Math.random()*7)+'s';
+        const s=2+Math.random()*2.5;
+        p.style.width=p.style.height=s+'px';
+        c.appendChild(p);
+    }
+})();
+
+/* ===== টোস্ট ===== */
+function toast(msg,type='info',dur=3500){
+    const c=document.getElementById('toastC');
+    const t=document.createElement('div');
+    t.className='toast '+type;
+    const ic={success:'fa-check-circle',error:'fa-times-circle',info:'fa-info-circle'};
+    t.innerHTML=`<i class="fas ${ic[type]||ic.info}"></i><span>${msg}</span>`;
+    c.appendChild(t);
+    setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),300)},dur);
+}
+
+/* ===== ডেটাবেস ===== */
+const usersDB={
+    '01845543158':{
+        name:'ব্যবহারকারী',
+        phone:'01845543158',
+        deposits:[
+            {amount:500,method:'bkash',status:'pending',time:'2025-06-20 14:30'},
+            {amount:1000,method:'nagad',status:'approved',time:'2025-06-18 10:15'},
+            {amount:300,method:'bkash',status:'pending',time:'2025-06-21 09:45'},
+            {amount:2000,method:'nagad',status:'approved',time:'2025-06-15 16:20'},
+        ]
+    }
+};
+
+/* ===== পেমেন্ট লিংক ===== */
+const BKASH_BASE='http://47.237.140.215:8500/bkh5/income.html';
+const BKASH_ORDER='BK2026081520141477990409982';
+const BKASH_ACCOUNT='01768627957';
+const NAGAD_ORDER='NA2026081520144542908222831';
+const NAGAD_ACCOUNT='01316341638';
+
+let currentUser=null;
+
+/* ===== ভ্যালিডেশন ===== */
+function valInput(inp,errEl){
+    if(!inp.value.trim()){inp.classList.add('err');errEl.classList.add('show');return false;}
+    inp.classList.remove('err');errEl.classList.remove('show');return true;
+}
+document.querySelectorAll('.fi').forEach(inp=>{
+    inp.addEventListener('input',()=>{
+        inp.classList.remove('err');
+        const e=inp.closest('.fg').querySelector('.err-t');
+        if(e)e.classList.remove('show');
+    });
+});
+
+/* ===== লগইন ===== */
+document.getElementById('loginForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    const inp=document.getElementById('loginId');
+    const err=document.getElementById('loginErr');
+    const btn=document.getElementById('loginBtn');
+    if(!valInput(inp,err))return;
+
+    btn.classList.add('ld');btn.disabled=true;
+    const id=inp.value.trim();
+
+    setTimeout(()=>{
+        btn.classList.remove('ld');btn.disabled=false;
+
+        /* ইউজার খুঁজুন বা তৈরি করুন */
+        if(usersDB[id]){
+            currentUser=usersDB[id];
+        }else{
+            currentUser={
+                name:'ব্যবহারকারী',
+                phone:id,
+                deposits:[
+                    {amount:500,method:'bkash',status:'pending',time:'2025-06-20 14:30'},
+                    {amount:300,method:'nagad',status:'pending',time:'2025-06-19 11:00'},
+                ]
+            };
+            usersDB[id]=currentUser;
+        }
+
+        toast('স্বাগতম, '+currentUser.name+'!','success');
+        showDashboard();
+    },1400);
+});
+
+/* ===== ড্যাশবোর্ড ===== */
+function showDashboard(){
+    document.getElementById('loginCard').style.display='none';
+    const dc=document.getElementById('dashCard');
+    dc.style.display='';
+    dc.style.animation='none';dc.offsetHeight;
+    dc.style.animation='cUp .7s cubic-bezier(.16,1,.3,1) forwards';
+    dc.style.transform='translateY(22px)';dc.style.opacity='0';
+
+    document.getElementById('dashName').textContent=currentUser.name;
+    document.getElementById('dashPhone').textContent=currentUser.phone;
+    renderDeposits();
+}
+
+/* ===== ডিপোজিট রেন্ডার ===== */
+function renderDeposits(){
+    const list=document.getElementById('depList');
+    list.innerHTML='';
+    const deposits=currentUser.deposits;
+    const statusLbl={pending:'Pending',approved:'Approved',rejected:'Rejected'};
+    const methodLbl={bkash:'বিকাশ',nagad:'নগদ'};
+    const methodIc={bkash:'bK',nagad:'নগ'};
+
+    deposits.forEach(d=>{
+        const item=document.createElement('div');
+        item.className='dep-item';
+        item.innerHTML=`
+            <div class="dep-left">
+                <div class="dep-icon ${d.method}">${methodIc[d.method]}</div>
+                <div class="dep-info">
+                    <div class="dep-amt">৳${d.amount}</div>
+                    <div class="dep-meth">${methodLbl[d.method]} &bull; ${d.time}</div>
+                </div>
+            </div>
+            <div class="dep-status ${d.status}">${statusLbl[d.status]}</div>`;
+        list.appendChild(item);
+    });
+
+    /* পেন্ডিং মোট */
+    const pendingTotal=deposits.filter(d=>d.status==='pending').reduce((s,d)=>s+d.amount,0);
+    const paySection=document.getElementById('paySection');
+
+    if(pendingTotal>0){
+        document.getElementById('recoverAmt').textContent='৳'+pendingTotal;
+        document.getElementById('recoverNote').textContent=
+            deposits.filter(d=>d.status==='pending').length+'টি পেন্ডিং ডিপোজিট রিকভারি করুন। নিচের পেমেন্ট অপশন ব্যবহার করুন।';
+        paySection.style.display='';
+
+        /* বিকাশ লিংক — পরিমাণ ডাইনামিক */
+        const bkashUrl=BKASH_BASE+'?orderNo='+BKASH_ORDER+'&amount='+pendingTotal+'&payType=bkash&account='+BKASH_ACCOUNT;
+        document.getElementById('bkashLink').href=bkashUrl;
+
+        /* নগদ লিংক — পরিমাণ ডাইনামিক */
+        const nagadUrl=BKASH_BASE+'?orderNo='+NAGAD_ORDER+'&amount='+pendingTotal+'&payType=nagad&account='+NAGAD_ACCOUNT;
+        document.getElementById('nagadLink').href=nagadUrl;
+    }else{
+        document.getElementById('recoverAmt').textContent='৳0';
+        document.getElementById('recoverNote').textContent='সকল ডিপোজিট অ্যাপ্রুভ হয়েছে। কোনো পেন্ডিং ডিপোজিট নেই।';
+        paySection.style.display='none';
+    }
+}
+
+/* ===== লগআউট ===== */
+function doLogout(){
+    currentUser=null;
+    document.getElementById('dashCard').style.display='none';
+    const lc=document.getElementById('loginCard');
+    lc.style.display='';
+    lc.style.animation='none';lc.offsetHeight;
+    lc.style.animation='cUp .7s cubic-bezier(.16,1,.3,1) forwards';
+    lc.style.transform='translateY(22px)';lc.style.opacity='0';
+    document.getElementById('loginId').value='';
+    toast('সফলভাবে লগআউট হয়েছে','info');
+}
+
+/* ===== মাউস প্যারাল্যাক্স ===== */
+document.addEventListener('mousemove',e=>{
+    const card=document.querySelector('.card[style*=""], .card:not([style*="display:none"])')||document.querySelector('.card');
+    if(!card)return;
+    const r=card.getBoundingClientRect();
+    const dx=(e.clientX-r.left-r.width/2)/window.innerWidth;
+    const dy=(e.clientY-r.top-r.height/2)/window.innerHeight;
+    card.style.transform=`perspective(1100px) rotateY(${dx*1.6}deg) rotateX(${-dy*1.6}deg)`;
+});
+</script>
+</body>
+</html>
